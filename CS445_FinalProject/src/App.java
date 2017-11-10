@@ -1,3 +1,15 @@
+/*************************************************************** 
+*   file: App.java 
+*   group: Multi Man Melee
+*   class: CS 445 - Computer Graphics
+* 
+*   assignment: Final Project
+*   date last modified: 11/9/17
+* 
+*   purpose: The main class for this program. Initializes the window 
+*       and starts the game loop
+* 
+****************************************************************/ 
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;

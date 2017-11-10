@@ -1,3 +1,16 @@
+/*************************************************************** 
+*   file: CameraController.java 
+*   group: Multi Man Melee
+*   class: CS 445 - Computer Graphics
+* 
+*   assignment: Final Project
+*   date last modified: 11/9/17
+* 
+*   purpose: This class represents a camera that will be used to render a scene
+*       and it also contains the main game loop for the program
+* 
+****************************************************************/ 
+
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -21,14 +34,20 @@ public class CameraController {
         pitch = 0f;
     }
 
+    //method: yaw
+    //purpose: adjusts the yaw
     public void yaw(float amount) {
         yaw += amount;
     }
 
+    //method: pitch
+    //purpose: adjusts the pitch
     public void pitch(float amount) {
         pitch -= amount;
     }
 
+    //method: walkForward
+    //purpose: moves the camera forward a set distance
     public void walkForward(float distance) {
         float xOffset = distance * (float) Math.sin(Math.toRadians(yaw));
         float zOffset = distance * (float) Math.cos(Math.toRadians(yaw));
@@ -36,13 +55,17 @@ public class CameraController {
         position.z += zOffset;
     }
 
+    //method: walkBackwards
+    //purpose: moves the camera backwards a set distance
     public void walkBackwards(float distance) {
         float xOffset = distance * (float) Math.sin(Math.toRadians(yaw));
         float zOffset = distance * (float) Math.cos(Math.toRadians(yaw));
         position.x += xOffset;
         position.z -= zOffset;
     }
-
+    
+    //method: strafeLeft
+    //purpose: strafes the camera left a set distance
     public void strafeLeft(float distance) {
         float xOffset = distance * (float) Math.sin(Math.toRadians(yaw - 90));
         float zOffset = distance * (float) Math.cos(Math.toRadians(yaw - 90));
@@ -50,6 +73,8 @@ public class CameraController {
         position.z += zOffset;
     }
 
+    //method: strafeRight
+    //purpose: strafes the camera right a set distance
     public void strafeRight(float distance) {
         float xOffset = distance * (float) Math.sin(Math.toRadians(yaw + 90));
         float zOffset = distance * (float) Math.cos(Math.toRadians(yaw + 90));
@@ -57,20 +82,28 @@ public class CameraController {
         position.z += zOffset;
     }
 
+    //method: moveUp
+    //purpose: moves the camera up a set distance
     public void moveUp(float distance) {
         position.y -= distance;
     }
 
+    //method: moveDown
+    //purpose: moves the camera down a set distance
     public void moveDown(float distance) {
         position.y += distance;
     }
 
+    //method: lookThrough
+    //purpose: translates and rotates the matrix so it looks through the camera
     public void lookThrough() {
         glRotatef(pitch, 1.0f, 0f, 0f);
         glRotatef(yaw, 0f, 1f, 0f);
         glTranslatef(position.x, position.y, position.z);
     }
 
+    //method: gameLoop
+    //purpose: main loop for the game, checks for input, and calls render function
     public void gameLoop() {
         CameraController camera = new CameraController(0, 0, 0);
         float dx = 0;
@@ -86,8 +119,20 @@ public class CameraController {
             time = Sys.getTime();
             lastTime = time;
 
+            //get change in mouse position
             dx = Mouse.getDX();
             dy = Mouse.getDY();
+            
+            //update yaw and pitch based on change in mouse position
+            camera.yaw(dx * mouseSensitivity);
+            camera.pitch(dy * mouseSensitivity);
+            
+            //reset camera orientation and position
+            if(Keyboard.isKeyDown(Keyboard.KEY_R)) {
+                camera.yaw(-camera.yaw);
+                camera.pitch(camera.pitch);
+                camera.position.set(0,0,0);
+            }
             
             //move forward
             if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
@@ -121,7 +166,7 @@ public class CameraController {
             camera.lookThrough();
             glEnable(GL_DEPTH_TEST);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            //you would draw your scene here
+            
             render();
             //draw the buffer to the screen
             Display.update();
@@ -130,6 +175,8 @@ public class CameraController {
         Display.destroy();
     }
     
+    //method: render
+    //purpose: renders a cube with each side colored differently
     private void render() {
                 glColor3f(1.0f, 0.5f, 0f);
                 glTranslatef(0, 0, -10);

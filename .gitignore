@@ -25,3 +25,5 @@ hs_err_pid*
 /CS445_FinalProject/nbproject/
 /CS445_FinalProject/build.xml
 /CS445_FinalProject/manifest.mf
+/CS445_FinalProject/build/
+/CS445_FinalProject/test/
