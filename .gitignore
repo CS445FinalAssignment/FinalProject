@@ -20,3 +20,8 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+#exclude netbeans project files
+/CS445_FinalProject/nbproject/
+/CS445_FinalProject/build.xml
+/CS445_FinalProject/manifest.mf
