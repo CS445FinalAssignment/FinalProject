@@ -4,7 +4,7 @@
 *   class: CS 445 - Computer Graphics
 * 
 *   assignment: Final Project
-*   date last modified: 11/9/17
+*   date last modified: 11/15/17
 * 
 *   purpose: The main class for this program. Initializes the window 
 *       and starts the game loop
@@ -26,7 +26,7 @@ public class App {
     public void start() throws Exception {
         initWindow();
         initGL();
-        cc = new CameraController(0,0,0);
+        cc = new CameraController(0,0,0,2,2);
         cc.gameLoop();
     }
 
@@ -57,6 +57,10 @@ public class App {
 
         GLU.gluPerspective(100.0f, (float)displayMode.getWidth()/(float)displayMode.getHeight(), 0.1f, 300f);
 
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_COLOR_ARRAY);
+        glEnable(GL_DEPTH_TEST);
+        
         glMatrixMode(GL_MODELVIEW);
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
     }
