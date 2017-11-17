@@ -16,6 +16,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
+import org.lwjgl.util.vector.Vector3f;
 
 public class CameraController {
 
@@ -27,17 +28,19 @@ public class CameraController {
 
     private Vector3f me;
 
-    private Chunk[][] chunks;
+    //private Chunk[][] chunks;
+    private Chunk chunks;
     
-    public CameraController(float x, float y, float z, int width, int length) {
+    public CameraController(float x, float y, float z/*, int width, int length*/) {
         position = new Vector3f(x, y, z);
         IPosition = new Vector3f(0, 15f, 0);
         yaw = 0f;
         pitch = 0f;
-        chunks = new Chunk[width][length];
-        createChunks();
+        //chunks = new Chunk[width][length];
+        //createChunks();
     }
 
+    /*
     private void createChunks() {
         int length = Chunk.CHUNK_SIZE * Chunk.CUBE_LENGTH;
         for(int i = 0; i < chunks.length; i++) {
@@ -46,6 +49,7 @@ public class CameraController {
             }
         }
     }
+    */
     
     //method: yaw
     //purpose: adjusts the yaw
@@ -118,6 +122,11 @@ public class CameraController {
     //method: gameLoop
     //purpose: main loop for the game, checks for input, and calls render function
     public void gameLoop() {
+        
+        //create an chunk object here
+        chunks = new Chunk(0, 0, 0);
+        //
+        
         float dx = 0;
         float dy = 0;
         float dt = 0;
@@ -176,17 +185,19 @@ public class CameraController {
             glLoadIdentity();
             //look through the camera before you draw anything
             lookThrough();
-            glEnable(GL_DEPTH_TEST);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);           
             
             //Render each chunk
+            /*
             for (Chunk[] chunkArray : chunks) {
                 for (Chunk chunk : chunkArray) {
                     chunk.render();
                 }
             }
+            */
             
-            renderBoundaries();
+            //call render through chunk object
+            chunks.render();
             //draw the buffer to the screen
             Display.update();
             Display.sync(60);
@@ -196,6 +207,7 @@ public class CameraController {
     
     //method: renderBoundaries
     //purpose: renders an outline of each chunks boundaries
+    /*
     private void renderBoundaries() {       
         glColor3f(1,0,0);
         float length = Chunk.CUBE_LENGTH * Chunk.CHUNK_SIZE;
@@ -229,4 +241,5 @@ public class CameraController {
             }
         }
     }
+    */
 }

@@ -26,7 +26,7 @@ public class App {
     public void start() throws Exception {
         initWindow();
         initGL();
-        cc = new CameraController(0,0,0,2,2);
+        cc = new CameraController(0,0,0/*,2,2*/);
         cc.gameLoop();
     }
 
