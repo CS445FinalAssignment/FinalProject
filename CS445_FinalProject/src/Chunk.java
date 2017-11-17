@@ -113,9 +113,7 @@ public class Chunk {
     //method: getCubeColor
     //purpose: returns the color of the cube based on block type
     private float[] getCubeColor(Block block) {
-        switch(block.getID()) {
-            case 0:
-                return new float[]{0,1,0};
+        switch(block.getID()) {          
             case 1:
                 return new float[]{1,1,0};
             case 2:
@@ -126,8 +124,9 @@ public class Chunk {
                 return new float[]{0.5f,0.5f,0.5f};
             case 5: 
                 return new float[]{0.9f,0.9f,0.9f};
+            default:
+                return new float[]{0,1,0};
         }
-        return new float[]{1,1,1};
     }
     
     public Chunk(int startX, int startY, int startZ) {
@@ -136,15 +135,20 @@ public class Chunk {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
                 for (int z = 0; z < CHUNK_SIZE; z++) {
-                    if(r.nextFloat()>0.7f){
+                    if(r.nextFloat()>0.84f){
                         Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Grass);
-                    } else if(r.nextFloat()>0.4f){
+                    } else if(r.nextFloat()>0.67f){
                         Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Dirt);
-                    } else if(r.nextFloat()>0.2f){
+                    } else if(r.nextFloat()>0.51f){
                         Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Water);
-                    }else{
+                    } else if (r.nextFloat()>0.34f){
                         Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Bedrock);
+                    } else if (r.nextFloat()>0.17f) {
+                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Sand);
+                    } else {
+                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Stone);
                     }
+                    //Blocks[x][y][z].setActive(true);
                 }
             }
         }
