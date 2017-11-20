@@ -22,8 +22,11 @@ import org.newdawn.slick.util.ResourceLoader;
 public class Chunk {
     static final int CHUNK_SIZE = 32;
     static final int CUBE_LENGTH = 2;
+    static final double PERSISTANCE = 0.2;
+    static final int SEED = new Random().nextInt();
     
     private Block[][][] Blocks;
+    private double[][] heightMap;
     private int VBOVertexHandle;
     private int VBOColorHandle;
     private int VBOTextureHandle;
@@ -57,7 +60,7 @@ public class Chunk {
         FloatBuffer VertexTextureData = BufferUtils.createFloatBuffer((CHUNK_SIZE * CHUNK_SIZE *CHUNK_SIZE)* 6 * 12);
         for (float x = 0; x < CHUNK_SIZE; x++) {
             for (float z = 0; z < CHUNK_SIZE; z++) {
-                for(float y = 0; y < CHUNK_SIZE; y++){
+                for(float y = 0; y < heightMap[(int)x][(int)z]; y++){
                     VertexPositionData.put(createCube((float) (startX + x * CUBE_LENGTH) + CUBE_LENGTH / 2,(float)(y * CUBE_LENGTH) + CUBE_LENGTH / 2,(float) (startZ + z * CUBE_LENGTH) + CUBE_LENGTH));
                     VertexColorData.put(createCubeVertexCol(getCubeColor(Blocks[(int) x][(int) y][(int) z])));
                     VertexTextureData.put(createTexCube(0f,0f,Blocks[(int)x][(int)y][(int)z]));
@@ -356,8 +359,24 @@ public class Chunk {
         }
     } 
     
+    //method: generateHeightmap
+    //purpose: generates a 2d array representing a height map using simplex noise
+    private void generateHeightmap() {
+        SimplexNoise noise = new SimplexNoise(CHUNK_SIZE, PERSISTANCE, SEED);
+        heightMap = new double[CHUNK_SIZE][CHUNK_SIZE];
+        
+        for(int i = 0; i < CHUNK_SIZE; i ++){
+            for(int j = 0; j < CHUNK_SIZE; j++){
+                for(int k = 0; k < CHUNK_SIZE; k++){
+                    heightMap[i][j] = (noise.getNoise(i, j, k)+1)*8;
+                }
+            }
+        }
+    }
+    
     public Chunk(int startX, int startY, int startZ) {
-        r= new Random();
+        r = new Random();
+        generateHeightmap();
         Blocks = new Block[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
@@ -367,13 +386,13 @@ public class Chunk {
                     } else if(r.nextFloat()>0.67f){
                         Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Dirt);
                     } else if(r.nextFloat()>0.51f){
-                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Water);
-                    } else if (r.nextFloat()>0.34f){
-                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Bedrock);
-                    } else if (r.nextFloat()>0.17f) {
                         Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Sand);
-                    } else {
+                    } else if (r.nextFloat()>0.34f){
+                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Water);
+                    } else if (r.nextFloat()>0.17f) {
                         Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Stone);
+                    } else {
+                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Bedrock);
                     }
                 }
             }
