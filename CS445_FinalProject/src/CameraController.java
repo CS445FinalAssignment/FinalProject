@@ -4,7 +4,7 @@
 *   class: CS 445 - Computer Graphics
 * 
 *   assignment: Final Project
-*   date last modified: 11/15/17
+*   date last modified: 11/20/17
 * 
 *   purpose: This class represents a camera that will be used to render a scene
 *       and it also contains the main game loop for the program
@@ -28,28 +28,14 @@ public class CameraController {
 
     private Vector3f me;
 
-    //private Chunk[][] chunks;
-    private Chunk chunks;
+    private Chunk chunk;
     
-    public CameraController(float x, float y, float z/*, int width, int length*/) {
+    public CameraController(float x, float y, float z) {
         position = new Vector3f(x, y, z);
         IPosition = new Vector3f(0, 15f, 0);
         yaw = 0f;
         pitch = 0f;
-        //chunks = new Chunk[width][length];
-        //createChunks();
     }
-
-    /*
-    private void createChunks() {
-        int length = Chunk.CHUNK_SIZE * Chunk.CUBE_LENGTH;
-        for(int i = 0; i < chunks.length; i++) {
-            for(int j = 0; j < chunks[0].length; j++) {
-                chunks[j][i] = new Chunk(length * j,0,length * i);
-            }
-        }
-    }
-    */
     
     //method: yaw
     //purpose: adjusts the yaw
@@ -121,12 +107,7 @@ public class CameraController {
 
     //method: gameLoop
     //purpose: main loop for the game, checks for input, and calls render function
-    public void gameLoop() {
-        
-        //create an chunk object here
-        chunks = new Chunk(0, 0, 0);
-        //
-        
+    public void gameLoop() {       
         float dx = 0;
         float dy = 0;
         float dt = 0;
@@ -135,7 +116,9 @@ public class CameraController {
         float mouseSensitivity = 0.09f;
         float movementSpeed = 0.35f;
         Mouse.setGrabbed(true);
-
+        
+        chunk = new Chunk(0,0,0);
+        
         while (!Display.isCloseRequested() && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
             time = Sys.getTime();
             lastTime = time;
@@ -180,66 +163,19 @@ public class CameraController {
             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
                 moveDown(movementSpeed);
             }
-
+            
             //set the modelview matrix back to identity
             glLoadIdentity();
             //look through the camera before you draw anything
             lookThrough();
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);           
+
             
-            //Render each chunk
-            /*
-            for (Chunk[] chunkArray : chunks) {
-                for (Chunk chunk : chunkArray) {
-                    chunk.render();
-                }
-            }
-            */
+            chunk.render();
             
-            //call render through chunk object
-            chunks.render();
-            //draw the buffer to the screen
             Display.update();
             Display.sync(60);
         }
         Display.destroy();
     }
-    
-    //method: renderBoundaries
-    //purpose: renders an outline of each chunks boundaries
-    /*
-    private void renderBoundaries() {       
-        glColor3f(1,0,0);
-        float length = Chunk.CUBE_LENGTH * Chunk.CHUNK_SIZE;
-        for(int i = 0; i < chunks.length; i++) {
-            for(int j = 0; j < chunks[0].length; j++) {
-                //top
-                glBegin(GL_LINE_LOOP);
-                    glVertex3f(length * j, length, length * i);
-                    glVertex3f(length * j, length, length * i + length);
-                    glVertex3f(length * j + length, length, length * i + length);
-                    glVertex3f(length * j + length, length, length * i);
-                glEnd();
-                //bottom
-                glBegin(GL_LINE_LOOP);
-                    glVertex3f(length * j, 0, length * i);
-                    glVertex3f(length * j, 0, length * i + length);
-                    glVertex3f(length * j + 0, length, length * i + length);
-                    glVertex3f(length * j + 0, length, length * i);
-                glEnd();
-                //verticals
-                glBegin(GL_LINES);
-                    glVertex3f(length * j, length, length * i);
-                    glVertex3f(length * j, 0, length * i);
-                    glVertex3f(length * j, length, length * i + length);
-                    glVertex3f(length * j, 0, length * i + length);
-                    glVertex3f(length * j + length, length, length * i + length);
-                    glVertex3f(length * j + 0, length, length * i + length);
-                    glVertex3f(length * j + length, length, length * i);
-                    glVertex3f(length * j + 0, length, length * i);
-                glEnd();
-            }
-        }
-    }
-    */
 }
