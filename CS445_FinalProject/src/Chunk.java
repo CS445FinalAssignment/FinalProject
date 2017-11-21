@@ -399,7 +399,7 @@ public class Chunk {
         }
         
         try {
-            texture = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("textures.png"));
+            texture = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("terrain.png"));
         } catch(Exception e) {
             System.err.println("Error loading texture file!");
         }
