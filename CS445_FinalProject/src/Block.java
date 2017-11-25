@@ -4,7 +4,7 @@
 *   class: CS 445 - Computer Graphics
 * 
 *   assignment: Final Project
-*   date last modified: 11/15/17
+*   date last modified: 11/25/17
 * 
 *   purpose: This class represents a block including its type, 
 *           id, and whether its active
@@ -59,5 +59,10 @@ public class Block {
 
     public int getID() {
         return type.getID();
+    }
+    
+    @Override
+    public String toString() {
+        return "Block(" + x + ", + " + y + "," + z + "): " + type;
     }
 }
