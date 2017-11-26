@@ -1,44 +1,42 @@
-/*************************************************************** 
-*   file: CameraController.java 
-*   group: Multi Man Melee
-*   class: CS 445 - Computer Graphics
-* 
-*   assignment: Final Project
-*   date last modified: 11/25/17
-* 
-*   purpose: This class represents a camera that will be used to render a scene
-*       and it also contains the main game loop for the program
-* 
-****************************************************************/ 
 
-import java.nio.FloatBuffer;
-import org.lwjgl.BufferUtils;
+/** *************************************************************
+ *   file: CameraController.java
+ *   group: Multi Man Melee
+ *   class: CS 445 - Computer Graphics
+ *
+ *   assignment: Final Project
+ *   date last modified: 11/20/17
+ *
+ *   purpose: This class represents a camera that will be used to render a scene
+ *       and it also contains the main game loop for the program
+ *
+ *************************************************************** */
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.util.vector.Vector3f;
+import java.nio.FloatBuffer;
+import org.lwjgl.BufferUtils;
 
 public class CameraController {
 
     private Vector3f position;
     private Vector3f IPosition;
-
     private float yaw;
     private float pitch;
-
-    private Vector3f me;
-
     private Chunk chunk;
-    
+
     public CameraController(float x, float y, float z) {
-        position = new Vector3f(x, y, z);
+//        position = new Vector3f(x, y, z);
+        position = new Vector3f(-30f, -50f, 0f);
+        chunk = new Chunk(0, -100, -50);        // starting location of chunk relative to camera's initial position
         IPosition = new Vector3f(0, 15f, 0);
         yaw = 0f;
         pitch = 0f;
     }
-    
+
     //method: yaw
     //purpose: adjusts the yaw
     public void yaw(float amount) {
@@ -46,9 +44,15 @@ public class CameraController {
     }
 
     //method: pitch
-    //purpose: adjusts the pitch
+    //purpose: decrement the pitch by the amount param and keep it from allowing the camera to turn upside down
     public void pitch(float amount) {
         pitch -= amount;
+        if (pitch < -90) {
+            pitch = -90;
+        }
+        if (pitch > 90) {
+            pitch = 90;
+        }
     }
 
     //method: walkForward
@@ -58,9 +62,14 @@ public class CameraController {
         float zOffset = distance * (float) Math.cos(Math.toRadians(yaw));
         position.x -= xOffset;
         position.z += zOffset;
-        FloatBuffer lightPosition = BufferUtils.createFloatBuffer(4);
-        lightPosition.put(IPosition.x-=xOffset).put(IPosition.y).put(IPosition.z+=zOffset).put(1.0f).flip();
-        glLight(GL_LIGHT0, GL_POSITION, lightPosition);
+
+        /**
+         * These 3 lines of code move the lighting as you move the camera. Not
+         * sure if that is what he wants. *
+         */
+//        FloatBuffer lightPosition = BufferUtils.createFloatBuffer(4);
+//        lightPosition.put(IPosition.x-=xOffset).put(IPosition.y).put(IPosition.z+=zOffset).put(1.0f).flip();
+//        glLight(GL_LIGHT0, GL_POSITION, lightPosition);
     }
 
     //method: walkBackwards
@@ -70,11 +79,11 @@ public class CameraController {
         float zOffset = distance * (float) Math.cos(Math.toRadians(yaw));
         position.x += xOffset;
         position.z -= zOffset;
-        FloatBuffer lightPosition = BufferUtils.createFloatBuffer(4);
-        lightPosition.put(IPosition.x-=xOffset).put(IPosition.y).put(IPosition.z+=zOffset).put(1.0f).flip();
-        glLight(GL_LIGHT0, GL_POSITION, lightPosition);
+//        FloatBuffer lightPosition = BufferUtils.createFloatBuffer(4);
+//        lightPosition.put(IPosition.x-=xOffset).put(IPosition.y).put(IPosition.z+=zOffset).put(1.0f).flip();
+//        glLight(GL_LIGHT0, GL_POSITION, lightPosition);
     }
-    
+
     //method: strafeLeft
     //purpose: strafes the camera left a set distance
     public void strafeLeft(float distance) {
@@ -82,9 +91,9 @@ public class CameraController {
         float zOffset = distance * (float) Math.cos(Math.toRadians(yaw - 90));
         position.x -= xOffset;
         position.z += zOffset;
-        FloatBuffer lightPosition = BufferUtils.createFloatBuffer(4);
-        lightPosition.put(IPosition.x-=xOffset).put(IPosition.y).put(IPosition.z+=zOffset).put(1.0f).flip();
-        glLight(GL_LIGHT0, GL_POSITION, lightPosition);
+//        FloatBuffer lightPosition = BufferUtils.createFloatBuffer(4);
+//        lightPosition.put(IPosition.x-=xOffset).put(IPosition.y).put(IPosition.z+=zOffset).put(1.0f).flip();
+//        glLight(GL_LIGHT0, GL_POSITION, lightPosition);
     }
 
     //method: strafeRight
@@ -94,9 +103,9 @@ public class CameraController {
         float zOffset = distance * (float) Math.cos(Math.toRadians(yaw + 90));
         position.x -= xOffset;
         position.z += zOffset;
-        FloatBuffer lightPosition = BufferUtils.createFloatBuffer(4);
-        lightPosition.put(IPosition.x-=xOffset).put(IPosition.y).put(IPosition.z+=zOffset).put(1.0f).flip();
-        glLight(GL_LIGHT0, GL_POSITION, lightPosition);
+//        FloatBuffer lightPosition = BufferUtils.createFloatBuffer(4);
+//        lightPosition.put(IPosition.x-=xOffset).put(IPosition.y).put(IPosition.z+=zOffset).put(1.0f).flip();
+//        glLight(GL_LIGHT0, GL_POSITION, lightPosition);
     }
 
     //method: moveUp
@@ -114,17 +123,21 @@ public class CameraController {
     //method: lookThrough
     //purpose: translates and rotates the matrix so it looks through the camera
     public void lookThrough() {
-        glRotatef(pitch, 1.0f, 0f, 0f);
-        glRotatef(yaw, 0f, 1f, 0f);
-        glTranslatef(position.x, position.y, position.z);
+        glRotatef(pitch, 1.0f, 0f, 0f);                     // rotate the pitch around the X axis
+        glRotatef(yaw, 0f, 1f, 0f);                         // rotate the yaw around the Y axis
+        glTranslatef(position.x, position.y, position.z);   // translate to the position vector's location
+
+        // Lighting Position
         FloatBuffer lightPosition = BufferUtils.createFloatBuffer(4);
-        lightPosition.put(IPosition.x).put(IPosition.y).put(IPosition.z).put(1.0f).flip();
+        lightPosition.put(IPosition.x).put(
+                IPosition.y).put(IPosition.z).put(1.0f).flip();
         glLight(GL_LIGHT0, GL_POSITION, lightPosition);
     }
 
     //method: gameLoop
     //purpose: main loop for the game, checks for input, and calls render function
-    public void gameLoop() {       
+    public void gameLoop() {
+        CameraController camera = new CameraController(0, 0, 0);
         float dx = 0;
         float dy = 0;
         float dt = 0;
@@ -133,9 +146,8 @@ public class CameraController {
         float mouseSensitivity = 0.09f;
         float movementSpeed = 0.35f;
         Mouse.setGrabbed(true);
-        
-        chunk = new Chunk(0,0,0);
-        
+
+//        chunk = new Chunk(0, 0, 0);       // this kept resetting the lighting
         while (!Display.isCloseRequested() && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
             time = Sys.getTime();
             lastTime = time;
@@ -143,53 +155,52 @@ public class CameraController {
             //get change in mouse position
             dx = Mouse.getDX();
             dy = Mouse.getDY();
-            
+
             //update yaw and pitch based on change in mouse position
-            yaw(dx * mouseSensitivity);
-            pitch(dy * mouseSensitivity);
-            
+            camera.yaw(dx * mouseSensitivity);
+            camera.pitch(dy * mouseSensitivity);
+
             //reset camera orientation and position
-            if(Keyboard.isKeyDown(Keyboard.KEY_R)) {
+            if (Keyboard.isKeyDown(Keyboard.KEY_R)) {
                 yaw(-yaw);
                 pitch(pitch);
-                position.set(0,0,0);
+                position.set(0, 0, 0);
             }
-            
+
             //move forward
             if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
-                walkForward(movementSpeed);
+                camera.walkForward(movementSpeed);
             }
             //move backwards
             if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
-                walkBackwards(movementSpeed);
+                camera.walkBackwards(movementSpeed);
             }
 
             //strafe left
             if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
-                strafeLeft(movementSpeed);
+                camera.strafeLeft(movementSpeed);
             }
             //strafe right
             if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
-                strafeRight(movementSpeed);
+                camera.strafeRight(movementSpeed);
             }
             //move up
             if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
-                moveUp(movementSpeed);
+                camera.moveUp(movementSpeed);
             }
             //move down
             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-                moveDown(movementSpeed);
+                camera.moveDown(movementSpeed);
             }
-            
+
             //set the modelview matrix back to identity
             glLoadIdentity();
             //look through the camera before you draw anything
-            lookThrough();
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);           
+            camera.lookThrough();
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            
             chunk.render();
-            
+
             Display.update();
             Display.sync(60);
         }
