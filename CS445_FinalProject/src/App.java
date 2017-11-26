@@ -61,16 +61,17 @@ public class App {
 
         GLU.gluPerspective(100.0f, (float)displayMode.getWidth()/(float)displayMode.getHeight(), 0.1f, 300f);
 
+        // Lighting
         initLightArrays();
-        glLight(GL_LIGHT0, GL_POSITION, lightPosition);
-        glLight(GL_LIGHT0, GL_SPECULAR, whiteLight);
-        glLight(GL_LIGHT0, GL_DIFFUSE, whiteLight);
-        glLight(GL_LIGHT0, GL_AMBIENT, whiteLight);
+        glLight(GL_LIGHT0, GL_POSITION, lightPosition);     // sets our light’s position
+        glLight(GL_LIGHT0, GL_SPECULAR, whiteLight);        // sets our specular light
+        glLight(GL_LIGHT0, GL_DIFFUSE, whiteLight);         // sets our diffuse light
+        glLight(GL_LIGHT0, GL_AMBIENT, whiteLight);         // sets our ambient light
+        glEnable(GL_LIGHTING);                              // enables our lighting
+        glEnable(GL_LIGHT0);                                // enables light
         
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
-        glEnable(GL_LIGHTING);
-        glEnable(GL_LIGHT0);
         
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_COLOR_ARRAY);  
