@@ -43,20 +43,28 @@ public class Block {
         this.type = type;
     }
 
+    // method: setCoords
+    // purpose: Set coordinate position
     public void setCoords(float x, float y, float z) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    public boolean isAcive() {
+    // method: IsActive
+    // purpose: Return true if active, false otherwise
+    public boolean isActive() {
         return isActive;
     }
 
+    // method: SetActive
+    // purpose: Set block status to active
     public void setActive(Boolean active) {
         isActive = active;
     }
 
+    // method: getID
+    // purpose: return the id of the block
     public int getID() {
         return type.getID();
     }
