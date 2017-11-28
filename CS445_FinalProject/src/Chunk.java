@@ -5,7 +5,7 @@
  *   class: CS 445 - Computer Graphics
  *
  *   assignment: Final Project
- *   date last modified: 11/27/17
+ *   date last modified: 11/28/17
  *
  *   purpose: Holds data for all blocks in a chunk and provides the method
  *      for rendering all the blocks to the screen
@@ -216,7 +216,7 @@ public class Chunk {
         StartY = startY;
         StartZ = startZ;
 
-        Random r = new Random();
+        Random r = new Random(SEED);
 
         generateHeightmap();
 
@@ -256,14 +256,24 @@ public class Chunk {
         
         fillLevel += 1;
         
-        //ensure all edges of the chunk are blocks so that water placement doesnt look weird between chunks
-        for (int x = 0; x < CHUNK_SIZE; x++) {
-            blocks[x][fillLevel][0] = blocks[x][fillLevel + 1][0] == null ? new Block(Block.BlockType.BlockType_Grass) : new Block(Block.BlockType.BlockType_Dirt);
-            blocks[x][fillLevel][CHUNK_SIZE - 1] = blocks[x][fillLevel + 1][CHUNK_SIZE - 1] == null ? new Block(Block.BlockType.BlockType_Grass) : new Block(Block.BlockType.BlockType_Dirt);
-        }
-        for (int z = 0; z < CHUNK_SIZE; z++) {
-            blocks[0][fillLevel][z] = blocks[0][fillLevel + 1][z] == null ? new Block(Block.BlockType.BlockType_Grass) : new Block(Block.BlockType.BlockType_Dirt);
-            blocks[CHUNK_SIZE - 1][fillLevel][z] = blocks[CHUNK_SIZE - 1][fillLevel + 1][z] == null ? new Block(Block.BlockType.BlockType_Grass) : new Block(Block.BlockType.BlockType_Dirt);
+        //Fill in edges of of chunks on fillLevel to prevent weird chunk connections when water is generated
+        for (int i = 0; i < CHUNK_SIZE; i++) {
+            if(blocks[i][fillLevel][0] == null) {
+                blocks[i][fillLevel][0] = new Block(Block.BlockType.BlockType_Grass);
+                blocks[i][fillLevel - 1][0] = new Block(Block.BlockType.BlockType_Dirt);
+            }
+            if(blocks[i][fillLevel][CHUNK_SIZE - 1] == null) {
+                blocks[i][fillLevel][CHUNK_SIZE - 1] = new Block(Block.BlockType.BlockType_Grass);
+                blocks[i][fillLevel - 1][CHUNK_SIZE - 1] = new Block(Block.BlockType.BlockType_Dirt);
+            }
+            if(blocks[0][fillLevel][i] == null) {
+                blocks[0][fillLevel][i] = new Block(Block.BlockType.BlockType_Grass);
+                blocks[0][fillLevel - 1][i] = new Block(Block.BlockType.BlockType_Dirt);                
+            }
+            if(blocks[CHUNK_SIZE - 1][fillLevel][i] == null) {
+                blocks[CHUNK_SIZE - 1][fillLevel][i] = new Block(Block.BlockType.BlockType_Grass);
+                blocks[CHUNK_SIZE - 1][fillLevel - 1][i] = new Block(Block.BlockType.BlockType_Dirt);
+            }
         }
 
         //Turn edges of where water is going to be into sand      
@@ -318,8 +328,7 @@ public class Chunk {
                         blocks[x][height + 6][z - 1] = new Block(Block.BlockType.BlockType_Leaves);
 
                     }
-                }
-                if (value < 1) { //place pumpkin if value < 1
+                } else if (value > 98) { //place pumpkin if value > 98
                     if (blocks[x][height][z].getID() == Block.BlockType.BlockType_Grass.getID()) {
                         blocks[x][height + 1][z] = new Block(Block.BlockType.BlockType_Pumpkin);
                     }

@@ -4,7 +4,7 @@
  *   class: CS 445 - Computer Graphics
  *
  *   assignment: Final Project
- *   date last modified: 11/27/17
+ *   date last modified: 11/28/17
  *
  *   purpose: This class represents a camera that will be used to render a scene
  *       and it also contains the main game loop for the program
@@ -175,7 +175,7 @@ public class CameraController {
             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
                 moveDown(movementSpeed);
             }
-
+            
             //toggle Lighting using the L key
             if(Keyboard.isKeyDown(Keyboard.KEY_L)) {
                 lighting = !lighting;
