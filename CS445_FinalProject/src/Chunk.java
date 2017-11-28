@@ -1,10 +1,11 @@
-/***************************************************************
+
+/** *************************************************************
  *   file: Chunk.java
  *   group: Multi Man Melee
  *   class: CS 445 - Computer Graphics
  *
  *   assignment: Final Project
- *   date last modified: 11/25/17
+ *   date last modified: 11/27/17
  *
  *   purpose: Holds data for all blocks in a chunk and provides the method
  *       for rendering all the blocks to the screen
@@ -23,18 +24,17 @@ public class Chunk {
 
     static final int CHUNK_SIZE = 32;
     static final int CUBE_LENGTH = 2;
-    static final double PERSISTANCE = 0.2;
+    static final double PERSISTANCE = 0.3;
 
     static final int SEED = new Random().nextInt();
 
-    private Block[][][] Blocks;
+    private Block[][][] blocks;
     private double[][] heightMap;
     private int VBOVertexHandle;
     private int VBOColorHandle;
     private int VBOTextureHandle;
     private Texture texture;
     private int StartX, StartY, StartZ;
-    private Random r;
 
     //method: render
     //purpose: renders the chunk to the screen
@@ -59,18 +59,17 @@ public class Chunk {
         VBOTextureHandle = glGenBuffers();
         FloatBuffer VertexPositionData = BufferUtils.createFloatBuffer((CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE) * 6 * 12);
         FloatBuffer VertexColorData = BufferUtils.createFloatBuffer((CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE) * 6 * 12);
-        FloatBuffer VertexTextureData = BufferUtils.createFloatBuffer((CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE) * 6 * 12);
+        FloatBuffer VertexTextureData = BufferUtils.createFloatBuffer((CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE) * 6 * 8);
 
         for (float x = 0; x < CHUNK_SIZE; x++) {
             for (float z = 0; z < CHUNK_SIZE; z++) {
                 for (float y = 0; y < CHUNK_SIZE; y++) {
-//                for (float y = 0; y < heightMap[(int) x][(int) z]; y++) {     // use chunk size instead
-                    if (Blocks[(int) x][(int) y][(int) z] == null) {
+                    if (blocks[(int) x][(int) y][(int) z] == null) {
                         continue;
                     }
                     VertexPositionData.put(createCube((float) (startX + x * CUBE_LENGTH) + CUBE_LENGTH / 2, (float) (y * CUBE_LENGTH) + CUBE_LENGTH / 2, (float) (startZ + z * CUBE_LENGTH) + CUBE_LENGTH));
-                    VertexColorData.put(createCubeVertexCol(getCubeColor(Blocks[(int) x][(int) y][(int) z])));
-                    VertexTextureData.put(createTexCube(0f, 0f, Blocks[(int) x][(int) y][(int) z]));
+                    VertexColorData.put(createCubeVertexCol(getCubeColor(blocks[(int) x][(int) y][(int) z])));
+                    VertexTextureData.put(createTexCube(blocks[(int) x][(int) y][(int) z]));
 
                 }
             }
@@ -147,234 +146,34 @@ public class Chunk {
 
     //method: createTexCube
     //purpose: sets the texture for the cube based on its type
-    public static float[] createTexCube(float x, float y, Block block) {
-//        float offset = 1 / 16f;
-        float offset = (1024f / 16) / 1024f;
+    public static float[] createTexCube(Block block) {
         switch (block.getID()) {
-            case 0: // Grass
-                return new float[]{
-                    //TOP 
-                    x + offset * 3, y + offset * 10,
-                    x + offset * 2, y + offset * 10,
-                    x + offset * 2, y + offset * 9,
-                    x + offset * 3, y + offset * 9,
-                    // BOTTOM
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 3, y + offset * 0,
-                    // FRONT QUAD 
-                    x + offset * 3, y + offset * 0,
-                    x + offset * 4, y + offset * 0,
-                    x + offset * 4, y + offset * 1,
-                    x + offset * 3, y + offset * 1,
-                    // BACK QUAD
-                    x + offset * 4, y + offset * 1,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 3, y + offset * 0,
-                    x + offset * 4, y + offset * 0,
-                    // LEFT QUAD  
-                    x + offset * 3, y + offset * 0,
-                    x + offset * 4, y + offset * 0,
-                    x + offset * 4, y + offset * 1,
-                    x + offset * 3, y + offset * 1,
-                    // RIGHT QUAD
-                    x + offset * 3, y + offset * 0,
-                    x + offset * 4, y + offset * 0,
-                    x + offset * 4, y + offset * 1,
-                    x + offset * 3, y + offset * 1};
-            case 1: // Sand
-                return new float[]{ //2,3 1,2
-                    //TOP 
-                    x + offset * 3, y + offset * 2,
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 3, y + offset * 1,
-                    // BOTTOM
-                    x + offset * 3, y + offset * 2,
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 3, y + offset * 1,
-                    // FRONT QUAD 
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 3, y + offset * 2,
-                    x + offset * 2, y + offset * 2,
-                    // BACK QUAD
-                    x + offset * 3, y + offset * 2,
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 3, y + offset * 1,
-                    // LEFT QUAD  
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 3, y + offset * 2,
-                    x + offset * 2, y + offset * 2,
-                    // RIGHT QUAD
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 3, y + offset * 2,
-                    x + offset * 2, y + offset * 2};
-            case 2: // Water
-                return new float[]{
-                    //TOP 
-                    x + offset * 15, y + offset * 1,
-                    x + offset * 14, y + offset * 1,
-                    x + offset * 14, y + offset * 0,
-                    x + offset * 15, y + offset * 0,
-                    // BOTTOM
-                    x + offset * 15, y + offset * 1,
-                    x + offset * 14, y + offset * 1,
-                    x + offset * 14, y + offset * 0,
-                    x + offset * 15, y + offset * 0,
-                    // FRONT QUAD 
-                    x + offset * 14, y + offset * 0,
-                    x + offset * 15, y + offset * 0,
-                    x + offset * 15, y + offset * 1,
-                    x + offset * 14, y + offset * 1,
-                    // BACK QUAD
-                    x + offset * 15, y + offset * 1,
-                    x + offset * 14, y + offset * 1,
-                    x + offset * 14, y + offset * 0,
-                    x + offset * 15, y + offset * 0,
-                    // LEFT QUAD  
-                    x + offset * 14, y + offset * 0,
-                    x + offset * 15, y + offset * 0,
-                    x + offset * 15, y + offset * 1,
-                    x + offset * 14, y + offset * 1,
-                    // RIGHT QUAD
-                    x + offset * 14, y + offset * 0,
-                    x + offset * 15, y + offset * 0,
-                    x + offset * 15, y + offset * 1,
-                    x + offset * 14, y + offset * 1};
-            case 3: // Dirt
-                return new float[]{
-                    //TOP 
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 3, y + offset * 0,
-                    // BOTTOM
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 3, y + offset * 0,
-                    // FRONT QUAD 
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 3, y + offset * 0,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    // BACK QUAD
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 3, y + offset * 0,
-                    // LEFT QUAD  
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 3, y + offset * 0,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    // RIGHT QUAD
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 3, y + offset * 0,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 2, y + offset * 1};
-            case 4: // Stone
-                return new float[]{
-                    //TOP 
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 1, y + offset * 0,
-                    x + offset * 2, y + offset * 0,
-                    // BOTTOM
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 1, y + offset * 0,
-                    x + offset * 2, y + offset * 0,
-                    // FRONT QUAD 
-                    x + offset * 1, y + offset * 0,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 1, y + offset * 1,
-                    // BACK QUAD
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 1, y + offset * 0,
-                    x + offset * 2, y + offset * 0,
-                    // LEFT QUAD  
-                    x + offset * 1, y + offset * 0,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 1, y + offset * 1,
-                    // RIGHT QUAD
-                    x + offset * 1, y + offset * 0,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 1, y + offset * 1};
-            case 5: // Bedrock
-                return new float[]{
-                    //TOP 
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 1, y + offset * 2,
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    // BOTTOM
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 1, y + offset * 2,
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    // FRONT QUAD 
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 1, y + offset * 2,
-                    // BACK QUAD
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 1, y + offset * 2,
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    // LEFT QUAD  
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 1, y + offset * 2,
-                    // RIGHT QUAD
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 1, y + offset * 2};
+            case 0:
+                return BlockTexture.GRASS;
+            case 1:
+                return BlockTexture.SAND;
+            case 2:
+                return BlockTexture.WATER;
+            case 3:
+                return BlockTexture.DIRT;
+            case 4:
+                return BlockTexture.STONE;
+            case 5:
+                return BlockTexture.BEDROCK;
+            case 6:
+                return BlockTexture.LOG;
+            case 7:
+                return BlockTexture.LEAVES;
+            case 8:
+                return BlockTexture.IRONORE;
+            case 9:
+                return BlockTexture.EMERALDORE;
+            case 10:
+                return BlockTexture.GOLDORE;
+            case 11:
+                return BlockTexture.PUMPKIN;
             default:
-                return new float[]{
-                    //TOP 
-                    x + offset * 15, y + offset * 2,
-                    x + offset * 14, y + offset * 2,
-                    x + offset * 14, y + offset * 1,
-                    x + offset * 15, y + offset * 1,
-                    // BOTTOM
-                    x + offset * 15, y + offset * 2,
-                    x + offset * 14, y + offset * 2,
-                    x + offset * 14, y + offset * 1,
-                    x + offset * 15, y + offset * 1,
-                    // FRONT QUAD 
-                    x + offset * 14, y + offset * 1,
-                    x + offset * 15, y + offset * 1,
-                    x + offset * 15, y + offset * 2,
-                    x + offset * 14, y + offset * 2,
-                    // BACK QUAD
-                    x + offset * 15, y + offset * 2,
-                    x + offset * 14, y + offset * 2,
-                    x + offset * 14, y + offset * 1,
-                    x + offset * 15, y + offset * 1,
-                    // LEFT QUAD  
-                    x + offset * 14, y + offset * 1,
-                    x + offset * 15, y + offset * 1,
-                    x + offset * 15, y + offset * 2,
-                    x + offset * 14, y + offset * 2,
-                    // RIGHT QUAD
-                    x + offset * 14, y + offset * 1,
-                    x + offset * 15, y + offset * 1,
-                    x + offset * 15, y + offset * 2,
-                    x + offset * 14, y + offset * 2};
+                return BlockTexture.DEFAULT;
         }
     }
 
@@ -387,13 +186,20 @@ public class Chunk {
         for (int i = 0; i < CHUNK_SIZE; i++) {
             for (int j = 0; j < CHUNK_SIZE; j++) {
                 for (int k = 0; k < CHUNK_SIZE; k++) {
-                    heightMap[i][j] = (noise.getNoise(i, j, k) + 1) * 8;
+                    heightMap[i][j] = (noise.getNoise(StartX + i, StartY + j, StartZ + k) + 1) * 8;
                 }
             }
         }
     }
 
-    // Constructor
+    //method: toString
+    //purpose: returns string representation of this object
+    @Override
+    public String toString() {
+        return "Chunk(" + StartX + "," + StartY + "," + StartZ + ")";
+    }
+
+    // Constructor, block generation occurs here
     public Chunk(int startX, int startY, int startZ) {
         try {
             texture = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("textures.png"));
@@ -401,10 +207,19 @@ public class Chunk {
             System.err.println("Error loading texture file!");
         }
 
-        r = new Random();
+        VBOColorHandle = glGenBuffers();
+        VBOVertexHandle = glGenBuffers();
+        VBOTextureHandle = glGenBuffers();
+        StartX = startX;
+        StartY = startY;
+        StartZ = startZ;
+
+        Random r = new Random();
+
         generateHeightmap();
 
-        Blocks = new Block[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
+        //First pass through of generation
+        blocks = new Block[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
         int fillLevel = CHUNK_SIZE;
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
@@ -414,30 +229,51 @@ public class Chunk {
                 }
                 for (int y = 0; y < CHUNK_SIZE; y++) {
                     if (y > heightMap[x][z]) {
-                        Blocks[x][y][z] = null;
+                        blocks[x][y][z] = null;
                     } else if (y == 0) {
-                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Bedrock);
+                        blocks[x][y][z] = new Block(Block.BlockType.BlockType_Bedrock);
                     } else if (y < CHUNK_SIZE / 6) {
-                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Stone);
+                        int value = r.nextInt(101);
+                        if (value > 97) {
+                            blocks[x][y][z] = new Block(Block.BlockType.BlockType_GoldOre);
+                        } else if (value > 92) {
+                            blocks[x][y][z] = new Block(Block.BlockType.BlockType_IronOre);
+                        } else if (value > 90) {
+                            blocks[x][y][z] = new Block(Block.BlockType.BlockType_EmeraldOre);
+                        } else {
+                            blocks[x][y][z] = new Block(Block.BlockType.BlockType_Stone);
+                        }
                     } else if (y == height) {
-                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Grass);
+                        blocks[x][y][z] = new Block(Block.BlockType.BlockType_Grass);
                     } else {
-                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Dirt);
+                        blocks[x][y][z] = new Block(Block.BlockType.BlockType_Dirt);
                     }
                 }
             }
         }
-
-        //Turn edges of where water is going to be into sand
+        
         fillLevel += 1;
+        
+        //ensure all edges of the chunk are blocks so that water placement doesnt look weird between chunks
+        //TODO: fix grass being placed not on top on some edges
+        for (int x = 0; x < CHUNK_SIZE; x++) {
+            blocks[x][fillLevel][0] = blocks[x][fillLevel + 1][0] == null ? new Block(Block.BlockType.BlockType_Grass) : new Block(Block.BlockType.BlockType_Dirt);
+            blocks[x][fillLevel][CHUNK_SIZE - 1] = blocks[x][fillLevel + 1][CHUNK_SIZE - 1] == null ? new Block(Block.BlockType.BlockType_Grass) : new Block(Block.BlockType.BlockType_Dirt);
+        }
+        for (int z = 0; z < CHUNK_SIZE; z++) {
+            blocks[0][fillLevel][z] = blocks[0][fillLevel + 1][z] == null ? new Block(Block.BlockType.BlockType_Grass) : new Block(Block.BlockType.BlockType_Dirt);
+            blocks[CHUNK_SIZE - 1][fillLevel][z] = blocks[CHUNK_SIZE - 1][fillLevel + 1][z] == null ? new Block(Block.BlockType.BlockType_Grass) : new Block(Block.BlockType.BlockType_Dirt);
+        }
+
+        //Turn edges of where water is going to be into sand      
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
-                if (Blocks[x][fillLevel][z] == null) {
+                if (blocks[x][fillLevel][z] == null) {
                     continue;
                 }
-                if ((x + 1 < CHUNK_SIZE && Blocks[x + 1][fillLevel][z] == null) || (x - 1 >= 0 && Blocks[x - 1][fillLevel][z] == null)
-                        || (z + 1 < CHUNK_SIZE && Blocks[x][fillLevel][z + 1] == null) || (z - 1 >= 0 && Blocks[x][fillLevel][z - 1] == null)) {
-                    Blocks[x][fillLevel][z] = new Block(Block.BlockType.BlockType_Sand);
+                if ((x + 1 < CHUNK_SIZE && blocks[x + 1][fillLevel][z] == null) || (x - 1 >= 0 && blocks[x - 1][fillLevel][z] == null)
+                        || (z + 1 < CHUNK_SIZE && blocks[x][fillLevel][z + 1] == null) || (z - 1 >= 0 && blocks[x][fillLevel][z - 1] == null)) {
+                    blocks[x][fillLevel][z] = new Block(Block.BlockType.BlockType_Sand);
                 }
             }
         }
@@ -445,21 +281,51 @@ public class Chunk {
         //fill water in, set sand below the water if below the water isnt the bottom level
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
-                if (Blocks[x][fillLevel][z] == null) {
-                    Blocks[x][fillLevel][z] = new Block(Block.BlockType.BlockType_Water);
+                if (blocks[x][fillLevel][z] == null) {
+                    blocks[x][fillLevel][z] = new Block(Block.BlockType.BlockType_Water);
                     if (fillLevel - 1 >= 1) {
-                        Blocks[x][fillLevel - 1][z] = new Block(Block.BlockType.BlockType_Sand);
+                        blocks[x][fillLevel - 1][z] = new Block(Block.BlockType.BlockType_Sand);
                     }
                 }
             }
         }
 
-        VBOColorHandle = glGenBuffers();
-        VBOVertexHandle = glGenBuffers();
-        VBOTextureHandle = glGenBuffers();
-        StartX = startX;
-        StartY = startY;
-        StartZ = startZ;
+        //place trees/pumpkins at random
+        for (int x = 2; x < CHUNK_SIZE - 2; x++) {
+            for (int z = 2; z < CHUNK_SIZE - 2; z++) {
+                int value = r.nextInt(101);
+                int height = (int) heightMap[x][z];
+                if (value > 99) { //if num is > 75 try to gen a tree                   
+                    if (blocks[x][height][z].getID() == Block.BlockType.BlockType_Grass.getID()) {
+                        for (int i = 0; i < 5; i++) {
+                            blocks[x][height + 1 + i][z] = new Block(Block.BlockType.BlockType_Log);
+                        }
+                        for (int i = -2; i < 3; i++) {
+                            for (int j = -2; j < 3; j++) {
+                                if (i == 0 && j == 0) {
+                                    continue;
+                                }
+                                blocks[x + i][height + 4][z + j] = new Block(Block.BlockType.BlockType_Leaves);
+                                blocks[x + i][height + 5][z + j] = new Block(Block.BlockType.BlockType_Leaves);
+                            }
+                        }
+
+                        blocks[x + 1][height + 6][z] = new Block(Block.BlockType.BlockType_Leaves);
+                        blocks[x][height + 6][z + 1] = new Block(Block.BlockType.BlockType_Leaves);
+                        blocks[x][height + 6][z] = new Block(Block.BlockType.BlockType_Leaves);
+                        blocks[x - 1][height + 6][z] = new Block(Block.BlockType.BlockType_Leaves);
+                        blocks[x][height + 6][z - 1] = new Block(Block.BlockType.BlockType_Leaves);
+
+                    }
+                }
+                if (value < 1) {
+                    if (blocks[x][height][z].getID() == Block.BlockType.BlockType_Grass.getID()) {
+                        blocks[x][height + 1][z] = new Block(Block.BlockType.BlockType_Pumpkin);
+                    }
+                }
+            }
+        }
+
         rebuildMesh(startX, startY, startZ);
     }
 }

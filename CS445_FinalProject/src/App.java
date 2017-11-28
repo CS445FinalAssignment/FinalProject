@@ -4,7 +4,7 @@
 *   class: CS 445 - Computer Graphics
 * 
 *   assignment: Final Project
-*   date last modified: 11/25/17
+*   date last modified: 11/27/17
 * 
 *   purpose: The main class for this program. Initializes the window 
 *       and starts the game loop
@@ -30,7 +30,7 @@ public class App {
     public void start() throws Exception {
         initWindow();
         initGL();
-        cc = new CameraController(0,-20,0);
+        cc = new CameraController();
         cc.yaw(180);
         cc.gameLoop();
     }
@@ -54,7 +54,7 @@ public class App {
     // method: initGL
     // purpose: initilize the gl settings for the program
     private void initGL() {
-        glClearColor(0f, 0f, 0f, 0f);
+        glClearColor(0.529f, 0.808f, 0.922f, 1f);
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
