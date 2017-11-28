@@ -22,6 +22,7 @@ public class BlockTexture {
     public static final float[] DIRT = generateTexture(0,0,0,0,0,0,0,0,0,0,0,0);
     public static final float[] STONE = generateTexture(0,1,0,1,0,1,0,1,0,1,0,1);
     public static final float[] BEDROCK = generateTexture(1,1,1,1,1,1,1,1,1,1,1,1);
+    //Below are extra blocks added
     public static final float[] LOG = generateTexture(6,0,6,0,5,0,5,0,5,0,5,0);
     public static final float[] LEAVES = generateTexture(7,0,7,0,7,0,7,0,7,0,7,0);
     public static final float[] IRONORE = generateTexture(2,1,2,1,2,1,2,1,2,1,2,1);
@@ -40,10 +41,10 @@ public class BlockTexture {
         OFFSET * topX + PIXEL, OFFSET * topY + PIXEL,
         OFFSET * (topX + 1) - PIXEL, OFFSET * topY + PIXEL,
         // BOTTOM
-        OFFSET * (bottomX + 1) - PIXEL, OFFSET * (topY + 1) - PIXEL,
-        OFFSET * bottomX + PIXEL, OFFSET * (topY + 1) - PIXEL,
-        OFFSET * bottomX + PIXEL, OFFSET * topY + PIXEL,
-        OFFSET * (bottomX + 1) - PIXEL, OFFSET * topY + PIXEL,
+        OFFSET * (bottomX + 1) - PIXEL, OFFSET * (bottomY + 1) - PIXEL,
+        OFFSET * bottomX + PIXEL, OFFSET * (bottomY + 1) - PIXEL,
+        OFFSET * bottomX + PIXEL, OFFSET * bottomY + PIXEL,
+        OFFSET * (bottomX + 1) - PIXEL, OFFSET * bottomY + PIXEL,
         // FRONT QUAD 
         OFFSET * frontX + PIXEL, OFFSET * frontY + PIXEL,
         OFFSET * (frontX + 1) - PIXEL, OFFSET * frontY + PIXEL,
