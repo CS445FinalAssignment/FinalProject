@@ -8,9 +8,11 @@
  *   date last modified: 11/27/17
  *
  *   purpose: Holds data for all blocks in a chunk and provides the method
- *       for rendering all the blocks to the screen
- *
+ *      for rendering all the blocks to the screen
+ *      Added functionality to terrain gen: trees/pumpkins are place randomly on surface, ores(iron,gold,emerald) are placed randomly in stone area
+ *      A custom texture is used called textures.png, rather then the given texture file
  *************************************************************** */
+import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.Random;
 import org.lwjgl.BufferUtils;
@@ -53,7 +55,7 @@ public class Chunk {
 
     //method: rebuildMesh
     //purpose: reconstructs the mesh for the chunk
-    public void rebuildMesh(float startX, float startY, float startZ) {
+    private void rebuildMesh(float startX, float startY, float startZ) {
         VBOColorHandle = glGenBuffers();
         VBOVertexHandle = glGenBuffers();
         VBOTextureHandle = glGenBuffers();
@@ -70,7 +72,6 @@ public class Chunk {
                     VertexPositionData.put(createCube((float) (startX + x * CUBE_LENGTH) + CUBE_LENGTH / 2, (float) (y * CUBE_LENGTH) + CUBE_LENGTH / 2, (float) (startZ + z * CUBE_LENGTH) + CUBE_LENGTH));
                     VertexColorData.put(createCubeVertexCol(getCubeColor(blocks[(int) x][(int) y][(int) z])));
                     VertexTextureData.put(createTexCube(blocks[(int) x][(int) y][(int) z]));
-
                 }
             }
         }
@@ -203,13 +204,14 @@ public class Chunk {
     public Chunk(int startX, int startY, int startZ) {
         try {
             texture = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("textures.png"));
-        } catch (Exception e) {
-            System.err.println("Error loading texture file!");
+        } catch (IOException ioe) {
+            System.err.println("Error loading texture file: " + ioe.getMessage());
         }
 
         VBOColorHandle = glGenBuffers();
         VBOVertexHandle = glGenBuffers();
         VBOTextureHandle = glGenBuffers();
+        
         StartX = startX;
         StartY = startY;
         StartZ = startZ;
@@ -224,15 +226,15 @@ public class Chunk {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
                 int height = (int) heightMap[x][z];
-                if (height < fillLevel) {
+                if (height < fillLevel) { //update min height(fill level)
                     fillLevel = height;
                 }
                 for (int y = 0; y < CHUNK_SIZE; y++) {
                     if (y > heightMap[x][z]) {
                         blocks[x][y][z] = null;
-                    } else if (y == 0) {
+                    } else if (y == 0) { //bottom level
                         blocks[x][y][z] = new Block(Block.BlockType.BlockType_Bedrock);
-                    } else if (y < CHUNK_SIZE / 6) {
+                    } else if (y < CHUNK_SIZE / 6) { //bottom 1/6 of chunk, stone with chance for ore
                         int value = r.nextInt(101);
                         if (value > 97) {
                             blocks[x][y][z] = new Block(Block.BlockType.BlockType_GoldOre);
@@ -243,9 +245,9 @@ public class Chunk {
                         } else {
                             blocks[x][y][z] = new Block(Block.BlockType.BlockType_Stone);
                         }
-                    } else if (y == height) {
+                    } else if (y == height) { //top level
                         blocks[x][y][z] = new Block(Block.BlockType.BlockType_Grass);
-                    } else {
+                    } else { //lower than top, higher than stone level
                         blocks[x][y][z] = new Block(Block.BlockType.BlockType_Dirt);
                     }
                 }
@@ -255,7 +257,6 @@ public class Chunk {
         fillLevel += 1;
         
         //ensure all edges of the chunk are blocks so that water placement doesnt look weird between chunks
-        //TODO: fix grass being placed not on top on some edges
         for (int x = 0; x < CHUNK_SIZE; x++) {
             blocks[x][fillLevel][0] = blocks[x][fillLevel + 1][0] == null ? new Block(Block.BlockType.BlockType_Grass) : new Block(Block.BlockType.BlockType_Dirt);
             blocks[x][fillLevel][CHUNK_SIZE - 1] = blocks[x][fillLevel + 1][CHUNK_SIZE - 1] == null ? new Block(Block.BlockType.BlockType_Grass) : new Block(Block.BlockType.BlockType_Dirt);
@@ -295,7 +296,7 @@ public class Chunk {
             for (int z = 2; z < CHUNK_SIZE - 2; z++) {
                 int value = r.nextInt(101);
                 int height = (int) heightMap[x][z];
-                if (value > 99) { //if num is > 75 try to gen a tree                   
+                if (value > 99) { //place tree if value is > 99                 
                     if (blocks[x][height][z].getID() == Block.BlockType.BlockType_Grass.getID()) {
                         for (int i = 0; i < 5; i++) {
                             blocks[x][height + 1 + i][z] = new Block(Block.BlockType.BlockType_Log);
@@ -318,7 +319,7 @@ public class Chunk {
 
                     }
                 }
-                if (value < 1) {
+                if (value < 1) { //place pumpkin if value < 1
                     if (blocks[x][height][z].getID() == Block.BlockType.BlockType_Grass.getID()) {
                         blocks[x][height + 1][z] = new Block(Block.BlockType.BlockType_Pumpkin);
                     }

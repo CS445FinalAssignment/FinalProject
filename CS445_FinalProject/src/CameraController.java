@@ -10,7 +10,6 @@
  *       and it also contains the main game loop for the program
  *
  *************************************************************** */
-import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -21,13 +20,13 @@ import org.lwjgl.BufferUtils;
 
 public class CameraController {
 
-    private Vector3f position;
-    private Vector3f resetPosition;
-    private Vector3f IPosition;
+    private final Vector3f position;
+    private final Vector3f resetPosition;
+    private final Vector3f IPosition;
     private float yaw;
     private float pitch;
     private boolean lighting;
-    private Chunk[][] chunks;
+    private final Chunk[][] chunks;
     private final int size = 4;
     
     public CameraController() {
@@ -43,7 +42,6 @@ public class CameraController {
         for(int x = -half; x < limit; x++) {
             for (int z = -half; z < limit; z++) {
                 chunks[x + half][z + half] = new Chunk(x * Chunk.CHUNK_SIZE * Chunk.CUBE_LENGTH, -100, z * Chunk.CHUNK_SIZE * Chunk.CUBE_LENGTH);
-                System.out.println(chunks[x+half][z+half]);
             }
         }
     }
@@ -123,27 +121,20 @@ public class CameraController {
 
         // Lighting Position
         FloatBuffer lightPosition = BufferUtils.createFloatBuffer(4);
-        lightPosition.put(IPosition.x).put(
-                IPosition.y).put(IPosition.z).put(1.0f).flip();
+        lightPosition.put(IPosition.x).put(IPosition.y).put(IPosition.z).put(1.0f).flip();
         glLight(GL_LIGHT0, GL_POSITION, lightPosition);
     }
 
     //method: gameLoop
     //purpose: main loop for the game, checks for input, and calls render function
     public void gameLoop() {
-        float dx = 0;
-        float dy = 0;
-        float dt = 0;
-        float lastTime = 0;
-        long time = 0;
+        float dx;
+        float dy;
         float mouseSensitivity = 0.09f;
         float movementSpeed = 0.35f;
         Mouse.setGrabbed(true);
         
         while (!Display.isCloseRequested() && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
-            time = Sys.getTime();
-            lastTime = time;
-
             //get change in mouse position
             dx = Mouse.getDX();
             dy = Mouse.getDY();
@@ -152,7 +143,7 @@ public class CameraController {
             yaw(dx * mouseSensitivity);
             pitch(dy * mouseSensitivity);
 
-            //reset camera orientation and position
+            //reset camera orientation and position using the R key
             if (Keyboard.isKeyDown(Keyboard.KEY_R)) {
                 yaw(-yaw);
                 pitch(pitch);
@@ -185,7 +176,7 @@ public class CameraController {
                 moveDown(movementSpeed);
             }
 
-            //toggle Lighting
+            //toggle Lighting using the L key
             if(Keyboard.isKeyDown(Keyboard.KEY_L)) {
                 lighting = !lighting;
                 if(lighting) {

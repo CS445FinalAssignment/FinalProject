@@ -13,7 +13,7 @@
 public class Block {
 
     private boolean isActive;
-    private BlockType type;
+    private final BlockType type;
     private float x, y, z;
 
     public enum BlockType {
@@ -75,6 +75,8 @@ public class Block {
         return type.getID();
     }
     
+    //method: toString
+    //purpose: returns string representation of this object
     @Override
     public String toString() {
         return "Block(" + x + ", + " + y + "," + z + "): " + type;
